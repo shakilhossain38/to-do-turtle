@@ -10,6 +10,7 @@ ToDo App for Turtle Venture Flutter Developer recruitment assignment.
 * Add Task
 * Search Task
 * Edit Task
+* Delete Task
 * Filter Tasks
 * Mark as Favorite Task
 * Mark as Complete Task
