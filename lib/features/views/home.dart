@@ -1,20 +1,27 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:after_layout/after_layout.dart';
+import 'package:to_do_app_turtle/features/views/widgets/add_edit_prompt.dart';
 import 'package:to_do_app_turtle/features/views/widgets/tasks_list_tile_widget.dart';
+import 'package:to_do_app_turtle/utils/common_text_field.dart';
 
+import '../../utils/colors.dart';
 import '../../utils/string_resources.dart';
 import '../view_model/get_data_view_model.dart';
 
 class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> with AfterLayoutMixin {
-  void afterFirstLayout(BuildContext context) {}
+  @override
+  void afterFirstLayout(BuildContext context) {
+    GetDataViewModel.read(context).getTabsData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +36,7 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
           child: Center(
               child: Text(
             "$tabName",
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: Colors.black,
             ),
@@ -39,48 +46,120 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
     }
 
     var allTasks = Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: vm.toDoList.isEmpty
+          ? MainAxisAlignment.center
+          : MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) => TasksListTileWidget(),
-            ),
-          ),
-        ),
+        vm.toDoList.isEmpty ||
+                (vm.allTaskSearchController.text.isNotEmpty &&
+                    vm.tasksSearchElements.isEmpty)
+            ? Center(
+                child: Text(
+                  StringResources.noTaskText,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              )
+            : const SizedBox(),
+        vm.toDoList.isEmpty ||
+                (vm.allTaskSearchController.text.isNotEmpty &&
+                    vm.tasksSearchElements.isEmpty)
+            ? const Center(
+                child: SizedBox(),
+              )
+            : Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: ListView.builder(
+                    itemCount: vm.allTaskSearchController.text.isNotEmpty
+                        ? vm.tasksSearchElements.length
+                        : vm.toDoList.length,
+                    itemBuilder: (context, index) => TasksListTileWidget(
+                      data: vm.allTaskSearchController.text.isNotEmpty
+                          ? vm.tasksSearchElements[index]
+                          : vm.toDoList[index],
+                      isLastIndex: vm.allTaskSearchController.text.isNotEmpty
+                          ? index == vm.tasksSearchElements.length - 1
+                              ? true
+                              : false
+                          : index == vm.toDoList.length - 1
+                              ? true
+                              : false,
+                      index: index,
+                    ),
+                  ),
+                ),
+              ),
       ],
     );
     var favoriteTasks = Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: vm.toDoFavoriteList.isEmpty
+          ? MainAxisAlignment.center
+          : MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) => TasksListTileWidget(),
-            ),
-          ),
-        ),
+        vm.toDoFavoriteList.isEmpty
+            ? Center(
+                child: Text(
+                  StringResources.noTaskText,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              )
+            : const SizedBox(),
+        vm.toDoFavoriteList.isEmpty
+            ? const Center(
+                child: SizedBox(),
+              )
+            : Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: ListView.builder(
+                    itemCount: vm.toDoFavoriteList.length,
+                    itemBuilder: (context, index) => TasksListTileWidget(
+                      data: vm.toDoFavoriteList[index],
+                      isLastIndex: index == vm.toDoFavoriteList.length - 1
+                          ? true
+                          : false,
+                      index: index,
+                    ),
+                  ),
+                ),
+              ),
       ],
     );
     var completedTasks = Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: vm.toDoCompletedList.isEmpty
+          ? MainAxisAlignment.center
+          : MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) => TasksListTileWidget(),
-            ),
-          ),
-        ),
+        vm.toDoCompletedList.isEmpty
+            ? Center(
+                child: Text(
+                  StringResources.noTaskText,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              )
+            : const SizedBox(),
+        vm.toDoCompletedList.isEmpty
+            ? const Center(
+                child: SizedBox(),
+              )
+            : Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: ListView.builder(
+                    itemCount: vm.toDoCompletedList.length,
+                    itemBuilder: (context, index) => TasksListTileWidget(
+                      data: vm.toDoCompletedList[index],
+                      isLastIndex: index == vm.toDoCompletedList.length - 1
+                          ? true
+                          : false,
+                      index: index,
+                    ),
+                  ),
+                ),
+              ),
       ],
     );
 
@@ -94,7 +173,7 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     Row(
@@ -107,12 +186,12 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
                               children: [
                                 Text(
                                   "${DateFormat("EEEE").format(DateTime.now())},",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       fontStyle: FontStyle.italic),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 5,
                                 ),
                                 Text(
@@ -121,17 +200,17 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
                                 ),
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 5,
                             ),
                             Text(
                               StringResources.toDoListText,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 5,
                             ),
                           ],
@@ -144,46 +223,64 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
                           child: Row(
                             children: [
                               GestureDetector(
-                                onTap: () async {},
+                                onTap: () async {
+                                  vm.isLatest = true;
+                                  vm.getTabsData(sortBy: "desc");
+                                },
                                 child: AnimatedContainer(
-                                  duration: Duration(milliseconds: 500),
+                                  duration: const Duration(milliseconds: 500),
                                   width: 45,
                                   height: 20,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
+                                    borderRadius: const BorderRadius.only(
                                         topLeft: Radius.circular(3),
                                         bottomLeft: Radius.circular(3)),
-                                    color: Colors.grey.shade300,
+                                    color: vm.isLatest
+                                        ? AppTheme.primaryColor
+                                        : Colors.grey.shade300,
                                   ),
                                   child: Center(
                                       child: Text(
                                     "Latest",
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.normal),
+                                        color: vm.isLatest
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontWeight: vm.isLatest
+                                            ? FontWeight.w600
+                                            : FontWeight.normal),
                                   )),
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () async {},
+                                onTap: () async {
+                                  vm.isLatest = false;
+                                  vm.getTabsData(sortBy: "asc");
+                                },
                                 child: AnimatedContainer(
-                                  duration: Duration(milliseconds: 500),
+                                  duration: const Duration(milliseconds: 500),
                                   width: 45,
                                   height: 20,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
+                                    borderRadius: const BorderRadius.only(
                                         topRight: Radius.circular(3),
                                         bottomRight: Radius.circular(3)),
-                                    color: Colors.grey.shade300,
+                                    color: !vm.isLatest
+                                        ? AppTheme.primaryColor
+                                        : Colors.grey.shade300,
                                   ),
                                   child: Center(
                                       child: Text(
                                     "Oldest",
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.normal),
+                                        color: !vm.isLatest
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontWeight: !vm.isLatest
+                                            ? FontWeight.w600
+                                            : FontWeight.normal),
                                   )),
                                 ),
                               )
@@ -192,19 +289,27 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
                         ),
                       ],
                     ),
+                    CommonTextField(
+                      controller: vm.allTaskSearchController,
+                      onChanged: (v) {
+                        vm.findSearchItem(query: v, initialItems: vm.toDoList);
+                      },
+                    ),
                     DefaultTabController(
                       length: 3,
                       child: Expanded(
                         child: Column(
                           children: [
                             Container(
-                              constraints: BoxConstraints(maxHeight: 150.0),
+                              constraints:
+                                  const BoxConstraints(maxHeight: 150.0),
                               child: TabBar(
                                 //indicatorColor: Color(0xff8592E5),
                                 indicatorWeight: 4,
-                                labelStyle: TextStyle(
+                                labelStyle: const TextStyle(
                                     fontSize: 14, fontWeight: FontWeight.bold),
-                                unselectedLabelStyle: TextStyle(fontSize: 12),
+                                unselectedLabelStyle:
+                                    const TextStyle(fontSize: 12),
                                 tabs: [
                                   tabWidget(tabName: StringResources.allText),
                                   tabWidget(
@@ -235,11 +340,12 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
             ),
       floatingActionButton: InkWell(
         onTap: () {
-          // showDialog(
-          //     context: context,
-          //     builder: (BuildContext context) {
-          //       return AddEditTask();
-          //     });
+          vm.reset();
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AddEditTask();
+              });
         },
         child: Container(
           height: 65,
@@ -253,12 +359,12 @@ class _HomeState extends State<Home> with AfterLayoutMixin {
             children: [
               Text(
                 StringResources.addText,
-                style: TextStyle(
+                style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                     fontSize: 16),
               ),
-              Icon(
+              const Icon(
                 Icons.add,
                 size: 30,
                 color: Colors.white,

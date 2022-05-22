@@ -1,28 +1,47 @@
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
+
+import '../../../utils/colors.dart';
+import '../../../utils/string_resources.dart';
+import '../../view_model/get_data_view_model.dart';
+import 'add_edit_prompt.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'dart:ui' as ui;
 import 'package:auto_size_text/auto_size_text.dart';
 
-import '../../../utils/colors.dart';
-import '../../view_model/get_data_view_model.dart';
-
 class TasksListTileWidget extends StatelessWidget {
+  var data;
+  bool isLastIndex;
+  int? index;
+  TasksListTileWidget({this.data, this.isLastIndex = false, this.index});
+  bool hasTextOverflow(String? text,
+      {double minWidth = 0, double maxWidth = 0, int maxLines = 3}) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text),
+      maxLines: maxLines,
+      textDirection: ui.TextDirection.ltr,
+    )..layout(minWidth: minWidth, maxWidth: maxWidth);
+    return textPainter.didExceedMaxLines;
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool isOverFlow = hasTextOverflow(data['message'].toString(),
+        maxWidth: MediaQuery.of(context).size.width * .55);
     var vm = GetDataViewModel.watch(context);
-
-    var spaceBetween = SizedBox(
+    Color color = index! % 2 == 0 ? Colors.teal : Colors.amber;
+    var spaceBetween = const SizedBox(
       width: 5,
     );
     var dateSection = Container(
         decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.only(
+            color: color,
+            borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(15), bottomLeft: Radius.circular(15))),
         //height: 50,
         width: 40,
-        constraints: BoxConstraints(minHeight: 110, minWidth: 40),
+        constraints: const BoxConstraints(minHeight: 110, minWidth: 40),
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,8 +49,8 @@ class TasksListTileWidget extends StatelessWidget {
             children: [
               Center(
                 child: Text(
-                  "22/05/22",
-                  style: TextStyle(
+                  DateFormat("dd").format(DateTime.parse(data['date'])),
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white),
@@ -39,8 +58,8 @@ class TasksListTileWidget extends StatelessWidget {
               ),
               Center(
                 child: Text(
-                  "22/05/22",
-                  style: TextStyle(
+                  DateFormat("MMM").format(DateTime.parse(data['date'])),
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white),
@@ -48,8 +67,8 @@ class TasksListTileWidget extends StatelessWidget {
               ),
               Center(
                 child: Text(
-                  "22/05/22",
-                  style: TextStyle(
+                  DateFormat("yy").format(DateTime.parse(data['date'])),
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white),
@@ -59,26 +78,26 @@ class TasksListTileWidget extends StatelessWidget {
           ),
         ));
     var message = AutoSizeText(
-      "ASDsadsadsadasfdsadas",
+      data["message"] ?? "",
       maxLines: 3,
-      style: TextStyle(fontSize: 14),
+      style: const TextStyle(fontSize: 14),
       minFontSize: 15,
       overflowReplacement: Column(
         // This widget will be replaced.
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            "message",
+            data["message"] ?? "",
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(),
+              const SizedBox(),
               GestureDetector(
                 onTap: () {
-                  // vm.showMoreIndex = index!;
+                  vm.showMoreIndex = index!;
                 },
                 child: Text(
                   "Show more",
@@ -91,35 +110,63 @@ class TasksListTileWidget extends StatelessWidget {
       ),
     );
     var subTitle = Container(
-        constraints: BoxConstraints(minWidth: 10),
+        constraints: const BoxConstraints(minWidth: 10),
         decoration: BoxDecoration(
             border: Border.all(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: const EdgeInsets.all(2.0),
-          child: Text("subtitle"),
+          child: Text(data["subTitle"] ?? ""),
         ));
     var title = Text(
-      "title",
+      data["title"],
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
-      style: TextStyle(fontWeight: FontWeight.bold),
+      style: const TextStyle(fontWeight: FontWeight.bold),
     );
     var favoriteComplete = Row(
       children: [
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            vm.updateTask(
+                id: data["id"],
+                isFavorite: data["isFavorite"] == 1 ? 0 : 1,
+                isCompleted: data["isCompleted"],
+                subTitle: data["subTitle"],
+                message: data["message"],
+                date: data["date"],
+                title: data["title"]);
+            BotToast.showText(
+                text: data["isFavorite"] == 0
+                    ? StringResources.markedAsFavoriteText
+                    : StringResources.removedFavoriteText);
+            vm.getTabsData();
+          },
           child: Icon(
-            Icons.favorite_border,
+            data["isFavorite"] == 1 ? Icons.favorite : Icons.favorite_border,
             size: 20,
-            color: Colors.red,
+            color: color,
           ),
         ),
         spaceBetween,
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            vm.updateTask(
+                id: data["id"],
+                isFavorite: data["isFavorite"],
+                isCompleted: data["isCompleted"] == 1 ? 0 : 1,
+                subTitle: data["subTitle"],
+                message: data["message"],
+                date: data["date"],
+                title: data["title"]);
+            BotToast.showText(
+                text: data["isCompleted"] == 0
+                    ? StringResources.markedAsCompleteText
+                    : StringResources.removedCompleteText);
+            vm.getTabsData();
+          },
           child: Icon(
-            Icons.star_border_outlined,
-            color: Colors.red,
+            data["isCompleted"] == 1 ? Icons.star : Icons.star_border_outlined,
+            color: color,
           ),
         ),
       ],
@@ -127,7 +174,7 @@ class TasksListTileWidget extends StatelessWidget {
     var taskSection = Expanded(
       child: Row(
         children: [
-          SizedBox(
+          const SizedBox(
             width: 15,
           ),
           Flexible(
@@ -153,7 +200,7 @@ class TasksListTileWidget extends StatelessWidget {
       height: 40,
       width: 40,
       decoration: BoxDecoration(
-        color: Colors.red,
+        color: color,
         borderRadius: BorderRadius.circular(50),
       ),
       child: Center(
@@ -162,7 +209,10 @@ class TasksListTileWidget extends StatelessWidget {
             Icons.delete,
             color: Colors.white,
           ),
-          onPressed: () {},
+          onPressed: () {
+            vm.deleteTask(data['id']!);
+            vm.getTabsData();
+          },
         ),
       ),
     );
@@ -170,7 +220,7 @@ class TasksListTileWidget extends StatelessWidget {
       height: 40,
       width: 40,
       decoration: BoxDecoration(
-        color: Colors.red,
+        color: color,
         borderRadius: BorderRadius.circular(50),
       ),
       child: IconButton(
@@ -178,15 +228,16 @@ class TasksListTileWidget extends StatelessWidget {
           Icons.edit,
           color: Colors.white,
         ),
-        onPressed: () {},
+        onPressed: () => showPrompt(
+            data['id']!, data['isFavorite']!, data['isCompleted']!, context),
       ),
     );
     var iconSection = Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(left: BorderSide(width: .5)),
         ),
         //height: 50,
-        constraints: BoxConstraints(minHeight: 110, minWidth: 40),
+        constraints: const BoxConstraints(minHeight: 110, minWidth: 40),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.only(left: 8.0),
@@ -195,11 +246,11 @@ class TasksListTileWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 editIcon,
-                SizedBox(
+                const SizedBox(
                   width: 3,
                 ),
                 deleteIcon,
-                SizedBox(
+                const SizedBox(
                   width: 3,
                 ),
               ],
@@ -209,29 +260,67 @@ class TasksListTileWidget extends StatelessWidget {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.only(bottom: 8),
+          margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.1),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: Offset(0, 1),
+              offset: const Offset(0, 1),
             ),
           ], color: Colors.white, borderRadius: BorderRadius.circular(15)),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              dateSection,
-              taskSection,
-              iconSection,
-            ],
-          ),
+          child: vm.showMoreIndex == index
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text(data['message']),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox(),
+                          GestureDetector(
+                              onTap: () {
+                                vm.showMoreIndex = -1;
+                              },
+                              child: Text(
+                                "Show Less",
+                                style: TextStyle(color: AppTheme.primaryColor),
+                              )),
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    dateSection,
+                    taskSection,
+                    iconSection,
+                  ],
+                ),
         ),
         SizedBox(
-          height: 0,
+          height: isLastIndex ? 50 : 0,
         )
       ],
     );
+  }
+
+  void showPrompt(
+      int? id, int? isFavorite, int? isCompleted, BuildContext context) {
+    var vm = GetDataViewModel.read(context);
+    vm.updateForm(id);
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AddEditTask(
+            id: id,
+            isCompleted: isCompleted,
+            isFavorite: isFavorite,
+          );
+        });
   }
 }

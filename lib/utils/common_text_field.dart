@@ -9,11 +9,12 @@ class CommonTextField extends StatelessWidget {
   final String? errorText;
   final int? maxLines;
   final GestureTapCallback? onTap;
-
+  final ValueChanged<String>? onChanged;
   const CommonTextField({
     this.readOnly = false,
     this.validator,
     this.controller,
+    this.onChanged,
     this.labelText,
     this.hintText,
     this.onTap,
@@ -31,6 +32,7 @@ class CommonTextField extends StatelessWidget {
             readOnly: readOnly!,
             onTap: onTap,
             controller: controller,
+            onChanged: onChanged,
             decoration: InputDecoration(
               labelText: labelText,
               fillColor: Colors.white,
