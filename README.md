@@ -16,7 +16,7 @@ ToDo App for Turtle Venture Flutter Developer recruitment assignment.
 * Mark as Complete Task
 * Show long task details
 ## Download APK
-<a id="raw-url" href="https://drive.google.com/uc?export=download&id=1YAM2YPNsmHLTusXMZkDllq8Ocp8ek6Fr-">Click here</a>
+<a id="raw-url" href="https://drive.google.com/uc?export=download&id=1YAM2YPNsmHLTusXMZkDllq8Ocp8ek6Fr">Click here</a>
 ## Screenshots of the app
 * Onboarding Screen![](https://drive.google.com/uc?export=download&id=10dvKuuNFKYcJr3Z4sffoImRrAUW4wLj-)
 * Home Page![](https://drive.google.com/uc?export=download&id=1NGp9l_S_rhsbXY3Wg1_deneqhiJCGd21)
