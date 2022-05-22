@@ -19,6 +19,6 @@ class MyApp extends StatelessWidget {
         navigatorObservers: [BotToastNavigatorObserver()],
         title: 'To do List',
         theme: AppTheme.primaryTheme,
-        home: Home());
+        home: const Home());
   }
 }
