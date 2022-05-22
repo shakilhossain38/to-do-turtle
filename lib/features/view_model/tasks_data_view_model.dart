@@ -1,20 +1,29 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:to_do_app_turtle/utils/string_resources.dart';
 
 import '../services/db_manager.dart';
 
-class GetDataViewModel extends ChangeNotifier {
-  static GetDataViewModel read(BuildContext context) =>
-      context.read<GetDataViewModel>();
-  static GetDataViewModel watch(BuildContext context) =>
-      context.watch<GetDataViewModel>();
+class TasksDataViewModel extends ChangeNotifier {
+  static TasksDataViewModel read(BuildContext context) =>
+      context.read<TasksDataViewModel>();
+  static TasksDataViewModel watch(BuildContext context) =>
+      context.watch<TasksDataViewModel>();
   int _selectedImage = 0;
   set selectedImage(int imageNumber) {
     _selectedImage = imageNumber;
     notifyListeners();
   }
 
+  int? _tabIndex = 0;
+  set tabIndex(int? v) {
+    _tabIndex = v;
+    notifyListeners();
+  }
+
+  int? get tabIndex => _tabIndex;
   bool _isLoading = false;
   set isLoading(bool value) {
     _isLoading = value;
@@ -30,12 +39,18 @@ class GetDataViewModel extends ChangeNotifier {
   final TextEditingController dateController = TextEditingController();
   final TextEditingController isFavoriteController = TextEditingController();
   final TextEditingController isCompletedController = TextEditingController();
+  final TextEditingController completedTaskSearchController =
+      TextEditingController();
   final TextEditingController allTaskSearchController = TextEditingController();
+  final TextEditingController favoriteTaskSearchController =
+      TextEditingController();
 
   List<Map<String, dynamic>> toDoList = [];
   List<Map<String, dynamic>> toDoCompletedList = [];
   List<Map<String, dynamic>> toDoFavoriteList = [];
   List<Map<String, dynamic>> tasksSearchElements = [];
+  List<Map<String, dynamic>> completedSearchElements = [];
+  List<Map<String, dynamic>> favoriteSearchElements = [];
   DateTime _pickedDate = DateTime.now();
   bool _isLatest = true;
   int _showMoreIndex = -1;
@@ -107,7 +122,7 @@ class GetDataViewModel extends ChangeNotifier {
         message: messageController.text,
         subTitle: subTitleController.text);
     _isLatest = true;
-    BotToast.showText(text: "Task added successfully!");
+    BotToast.showText(text:StringResources.addedSuccessfulText);
     reset();
     getTabsData();
   }
@@ -129,21 +144,24 @@ class GetDataViewModel extends ChangeNotifier {
         message: message ?? messageController.text,
         subTitle: subTitle ?? subTitleController.text);
     _isLatest = true;
-    BotToast.showText(text: "Task updated successfully!");
+    BotToast.showText(text: StringResources.updatedSuccessfulText);
     reset();
     getTabsData();
   }
 
   void deleteTask(int id) async {
     await DbManager.deleteTask(id);
-    BotToast.showText(text: "Successfully deleted the task!");
+    BotToast.showText(text: StringResources.deletedSuccessfulText);
     _isLatest = true;
     getTabsData();
   }
 
-  List<Map<String, dynamic>> findSearchItem(
-      {String? query, required List<Map<String, dynamic>> initialItems}) {
+  findSearchItem(
+      {String? query,
+      required List<Map<String, dynamic>> initialItems,
+      int tabIndex = 0}) {
     List<Map<String, dynamic>> initialFilterSearch = [];
+    List<Map<String, dynamic>> searchItems = [];
     for (var element in initialItems) {
       initialFilterSearch.add(element);
     }
@@ -153,10 +171,14 @@ class GetDataViewModel extends ChangeNotifier {
         initialFilterSearchItems.add(item);
       }
     }
-    tasksSearchElements.clear();
-    tasksSearchElements.addAll(initialFilterSearchItems);
+    searchItems.clear();
+    searchItems.addAll(initialFilterSearchItems);
+    tabIndex == 0
+        ? tasksSearchElements = searchItems
+        : tabIndex == 1
+            ? completedSearchElements = searchItems
+            : favoriteSearchElements = searchItems;
     notifyListeners();
-    return tasksSearchElements;
   }
 
   void reset() {
@@ -165,6 +187,8 @@ class GetDataViewModel extends ChangeNotifier {
     subTitleController.clear();
     messageController.clear();
     allTaskSearchController.clear();
+    favoriteTaskSearchController.clear();
+    completedTaskSearchController.clear();
     isCompletedController.clear();
     isFavoriteController.clear();
     dateController.clear();

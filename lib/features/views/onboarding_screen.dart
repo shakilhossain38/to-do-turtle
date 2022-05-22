@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/colors.dart';
 import '../../utils/string_resources.dart';
-import '../view_model/get_data_view_model.dart';
+import '../view_model/tasks_data_view_model.dart';
 import 'home.dart';
 
 class OnBoardingScreen extends StatefulWidget {
@@ -35,7 +35,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   void initState() {
     super.initState();
-    var vm = GetDataViewModel.read(context);
+    var vm = TasksDataViewModel.read(context);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       vm.resetSelectedImage();
     });
@@ -89,7 +89,70 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       );
     }
 
-    var vm = GetDataViewModel.watch(context);
+    var vm = TasksDataViewModel.watch(context);
+    var circlePageIndicator = Row(
+      children: [
+        Container(
+          height: width < 360 ? 11 : 13,
+          width: width < 360 ? 11 : 13,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              color: vm.selectedImage == 0
+                  ? AppTheme.primaryColor
+                  : Colors.transparent,
+              border: Border.all()),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        Container(
+          height: width < 360 ? 11 : 13,
+          width: width < 360 ? 11 : 13,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              color: vm.selectedImage == 1
+                  ? AppTheme.primaryColor
+                  : Colors.transparent,
+              border: Border.all()),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        Container(
+          height: width < 360 ? 11 : 13,
+          width: width < 360 ? 11 : 13,
+          decoration: BoxDecoration(
+              color: vm.selectedImage == 2
+                  ? AppTheme.primaryColor
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all()),
+        ),
+      ],
+    );
+    var nextButton = GestureDetector(
+      onTap: () async {
+        if (vm.selectedImage < 3) {
+          vm.selectedImage++;
+        }
+        pageController.jumpToPage(vm.selectedImage);
+        if (vm.selectedImage == 3) {
+          var storage = await SharedPreferences.getInstance();
+          storage.setBool("isOnBoardingSeen", true);
+          Navigator.pushReplacement(
+              context, CupertinoPageRoute(builder: (context) => Home()));
+        }
+      },
+      child: Container(
+        height: width < 360 ? 35 : 40,
+        width: width < 360 ? 35 : 40,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            color: AppTheme.primaryColor),
+        child:
+            Icon(Icons.arrow_forward_ios_outlined, size: width < 360 ? 18 : 20),
+      ),
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -99,8 +162,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         actions: <Widget>[
           GestureDetector(
             onTap: () async {
-              Navigator.pushReplacement(context,
-                  CupertinoPageRoute(builder: (context) =>  Home()));
+              Navigator.pushReplacement(
+                  context, CupertinoPageRoute(builder: (context) => Home()));
               var storage = await SharedPreferences.getInstance();
               storage.setBool("isOnBoardingSeen", true);
             },
@@ -121,7 +184,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               onPageChanged: (val) {
                 vm.selectedImage = val;
               },
-              //reverse: true,
               children: [
                 onBoardingElement(
                     imagePath: "assets/onboarding_1.png",
@@ -145,74 +207,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     padding: const EdgeInsets.only(right: 15.0, left: 15),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              height: width < 360 ? 11 : 13,
-                              width: width < 360 ? 11 : 13,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: vm.selectedImage == 0
-                                      ? AppTheme.primaryColor
-                                      : Colors.transparent,
-                                  border: Border.all()),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Container(
-                              height: width < 360 ? 11 : 13,
-                              width: width < 360 ? 11 : 13,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: vm.selectedImage == 1
-                                      ? AppTheme.primaryColor
-                                      : Colors.transparent,
-                                  border: Border.all()),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Container(
-                              height: width < 360 ? 11 : 13,
-                              width: width < 360 ? 11 : 13,
-                              decoration: BoxDecoration(
-                                  color: vm.selectedImage == 2
-                                      ? AppTheme.primaryColor
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(50),
-                                  border: Border.all()),
-                            ),
-                          ],
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            if (vm.selectedImage < 3) {
-                              vm.selectedImage++;
-                            }
-                            pageController.jumpToPage(vm.selectedImage);
-                            if (vm.selectedImage == 3) {
-                              var storage =
-                                  await SharedPreferences.getInstance();
-                              storage.setBool("isOnBoardingSeen", true);
-                              Navigator.pushReplacement(
-                                  context,
-                                  CupertinoPageRoute(
-                                      builder: (context) => Home()));
-                            }
-                          },
-                          child: Container(
-                            height: width < 360 ? 35 : 40,
-                            width: width < 360 ? 35 : 40,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: AppTheme.primaryColor),
-                            child: Icon(Icons.arrow_forward_ios_outlined,
-                                size: width < 360 ? 18 : 20),
-                          ),
-                        )
-                      ],
+                      children: [circlePageIndicator, nextButton],
                     ),
                   ),
                 ),

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/common_text_field.dart';
 import '../../../utils/string_resources.dart';
-import '../../view_model/get_data_view_model.dart';
+import '../../view_model/tasks_data_view_model.dart';
 
 class AddEditTask extends StatelessWidget {
   int? id;
@@ -13,7 +13,7 @@ class AddEditTask extends StatelessWidget {
   AddEditTask({this.id, this.isFavorite, this.isCompleted});
 
   Future<void> selectDate(BuildContext context) async {
-    var vm = GetDataViewModel.read(context);
+    var vm = TasksDataViewModel.read(context);
     final DateTime? date = await showDatePicker(
       //initialDatePickerMode: DatePickerMode.year,
       context: context,
@@ -41,7 +41,7 @@ class AddEditTask extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    var vm = GetDataViewModel.watch(context);
+    var vm = TasksDataViewModel.watch(context);
     vm.dateController.text = DateFormat("dd/MM/yyyy").format(vm.pickedDate);
     var spaceBetween = const SizedBox(
       height: 10,
@@ -102,7 +102,7 @@ class AddEditTask extends StatelessWidget {
     var addButton = ElevatedButton(
       onPressed: () async {
         if (_formKey.currentState!.validate()) {
-          var vm = GetDataViewModel.read(context);
+          var vm = TasksDataViewModel.read(context);
           if (id == null) {
             await vm.addNewTasks();
           }
@@ -110,6 +110,7 @@ class AddEditTask extends StatelessWidget {
             await vm.updateTask(
                 id: id!, isCompleted: isCompleted, isFavorite: isFavorite);
           }
+          vm.reset();
           Navigator.of(context).pop();
         }
       },

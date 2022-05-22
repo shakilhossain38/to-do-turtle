@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../utils/colors.dart';
 import '../../../utils/string_resources.dart';
-import '../../view_model/get_data_view_model.dart';
+import '../../view_model/tasks_data_view_model.dart';
 import 'add_edit_prompt.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'dart:ui' as ui;
@@ -29,7 +29,7 @@ class TasksListTileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isOverFlow = hasTextOverflow(data['message'].toString(),
         maxWidth: MediaQuery.of(context).size.width * .55);
-    var vm = GetDataViewModel.watch(context);
+    var vm = TasksDataViewModel.watch(context);
     Color color = index! % 2 == 0 ? Colors.teal : Colors.amber;
     var spaceBetween = const SizedBox(
       width: 5,
@@ -284,7 +284,7 @@ class TasksListTileWidget extends StatelessWidget {
                                 vm.showMoreIndex = -1;
                               },
                               child: Text(
-                                "Show Less",
+                                StringResources.showLessText,
                                 style: TextStyle(color: AppTheme.primaryColor),
                               )),
                         ],
@@ -311,7 +311,7 @@ class TasksListTileWidget extends StatelessWidget {
 
   void showPrompt(
       int? id, int? isFavorite, int? isCompleted, BuildContext context) {
-    var vm = GetDataViewModel.read(context);
+    var vm = TasksDataViewModel.read(context);
     vm.updateForm(id);
     showDialog(
         context: context,

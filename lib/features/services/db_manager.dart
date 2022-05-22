@@ -54,7 +54,7 @@ class DbManager {
   // all tasks list
   static Future<List<Map<String, dynamic>>> getTasks({String? sortBy}) async {
     final db = await DbManager.db();
-    return db.query('toDoList', orderBy: "title $sortBy");
+    return db.query('toDoList', orderBy: "date $sortBy");
   }
 
   //completed tasks list

@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do_app_turtle/features/views/onboarding_screen.dart';
 import 'package:to_do_app_turtle/root.dart';
 import 'package:to_do_app_turtle/utils/colors.dart';
-import 'features/view_model/get_data_view_model.dart';
+import 'features/view_model/tasks_data_view_model.dart';
 import 'features/views/home.dart';
 
 void main() {
@@ -22,8 +22,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var providers = [
-      ChangeNotifierProvider<GetDataViewModel>(
-          create: (context) => GetDataViewModel()),
+      ChangeNotifierProvider<TasksDataViewModel>(
+          create: (context) => TasksDataViewModel()),
     ];
     return MultiProvider(
         providers: providers,

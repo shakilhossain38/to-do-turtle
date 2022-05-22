@@ -1,11 +1,15 @@
 class StringResources {
   static String skipText = "Skip";
-  static String completeText = "Mark tasks as Favourite/Completed";
-  static String addYourTaskText = "Add Your Task here!";
+  static String completeText = "Mark Tasks as Favourite/Completed";
+  static String addYourTaskText = "Manage Your Task here!";
   static String welcomeText = "Welcome to the ToDO App";
   static String createText = "Add Task";
   static String updateText = "Update Task";
   static String addNewText = "Add New Task";
+  static String showLessText = "Show Less";
+  static String deletedSuccessfulText = "Successfully deleted the task!";
+  static String updatedSuccessfulText = "Task updated successfully!";
+  static String addedSuccessfulText = "Task added successfully!";
   static String addText = "Add";
   static String titleText = 'Title';
   static String subTitleText = "Subtitle";
