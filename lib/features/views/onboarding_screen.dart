@@ -100,7 +100,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           GestureDetector(
             onTap: () async {
               Navigator.pushReplacement(context,
-                  CupertinoPageRoute(builder: (context) => const Home()));
+                  CupertinoPageRoute(builder: (context) =>  Home()));
               var storage = await SharedPreferences.getInstance();
               storage.setBool("isOnBoardingSeen", true);
             },
@@ -131,7 +131,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     title: StringResources.addYourTaskText),
                 onBoardingElement(
                     imagePath: "assets/onboarding_3.png",
-                    title: StringResources.completedText),
+                    title: StringResources.completeText),
               ],
             ),
           ),
