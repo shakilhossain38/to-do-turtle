@@ -101,6 +101,7 @@ class TasksDataViewModel extends ChangeNotifier {
     getTasksList(sortBy: sortBy);
     getCompletedList(sortBy: sortBy);
     getFavoriteList(sortBy: sortBy);
+    reset();
   }
 
   updateForm(int? id) {
@@ -122,7 +123,7 @@ class TasksDataViewModel extends ChangeNotifier {
         message: messageController.text,
         subTitle: subTitleController.text);
     _isLatest = true;
-    BotToast.showText(text:StringResources.addedSuccessfulText);
+    BotToast.showText(text: StringResources.addedSuccessfulText);
     reset();
     getTabsData();
   }
